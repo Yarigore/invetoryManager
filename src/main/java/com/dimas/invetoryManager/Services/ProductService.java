@@ -19,7 +19,7 @@ public class ProductService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    public List<Product> findAllProducts(){
+    public List<Product> findAllProducts() {
         return productRepository.findAll();
     }
 
@@ -34,11 +34,11 @@ public class ProductService {
     }
 
 
-    public Product productById(Long id){
+    public Product productById(Long id) {
         return productRepository.findFirstById(id);
     }
 
-    public Product productPut(Long id, Product product){
+    public Product productPut(Long id, Product product) {
         Product existingProduct = productRepository.findFirstById(id);
         existingProduct.setName(product.getName());
         existingProduct.setDescription(product.getDescription());
@@ -48,10 +48,11 @@ public class ProductService {
         return productRepository.save(existingProduct);
     }
 
-    public Optional<Product> productDelete(Long id){
+    public Optional<Product> productDelete(Long id) {
 
         Optional<Product> productDelete = productRepository.findById(id);
         productRepository.deleteById(id);
         return productDelete;
     }
+
 }
