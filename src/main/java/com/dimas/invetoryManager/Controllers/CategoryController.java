@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/category")
 public class CategoryController {
@@ -13,9 +16,11 @@ public class CategoryController {
     @Autowired
     private CategoryService service;
 
-    @PostMapping()
-    public ResponseEntity<Category> categoryCreate(@RequestBody Category category){
-        return ResponseEntity.ok(service.productcreate(category));
+    @GetMapping()
+    public ResponseEntity<List<Category>> categoryList() {
+        Optional<List<Category>> products = Optional.ofNullable(service.findAllCategories());
+        if (products.isPresent()) return ResponseEntity.ok(service.findAllCategories());
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
@@ -25,13 +30,18 @@ public class CategoryController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Category> categoryPut(@PathVariable Long id, @RequestBody Category category){
+    @PostMapping("/add")
+    public ResponseEntity<Category> categoryCreate(@RequestBody Category category) {
+        return ResponseEntity.ok(service.productcreate(category));
+    }
+
+    @PutMapping("/put/{id}")
+    public ResponseEntity<Category> categoryPut(@PathVariable Long id, @RequestBody Category category) {
         return ResponseEntity.ok(service.categoryPut(id, category));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Category> categoryDelete(@PathVariable Long id){
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Category> categoryDelete(@PathVariable Long id) {
         return service.categoryDelete(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.badRequest().build());

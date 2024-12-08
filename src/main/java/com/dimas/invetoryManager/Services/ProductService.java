@@ -23,6 +23,10 @@ public class ProductService {
         return productRepository.findAll();
     }
 
+    public Optional<Product> findById(Long id) {
+        return productRepository.findById(id);
+    }
+
     public Product productCreate(Product product) {
         if (product.getCategory() != null) {
             Long categoryId = product.getCategory().getId();
@@ -40,13 +44,27 @@ public class ProductService {
 
     public Product productPut(Long id, Product product) {
         Product existingProduct = productRepository.findFirstById(id);
+        if (existingProduct == null) {
+            throw new RuntimeException("Product not found with ID: " + id);
+        }
+
         existingProduct.setName(product.getName());
         existingProduct.setDescription(product.getDescription());
-        existingProduct.setCategory(product.getCategory());
         existingProduct.setStock(product.getStock());
         existingProduct.setPrice(product.getPrice());
+
+        if (product.getCategory() != null && product.getCategory().getId() != null) {
+            Long categoryId = product.getCategory().getId();
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new RuntimeException("Category not found with ID: " + categoryId));
+            existingProduct.setCategory(category);
+        } else {
+            existingProduct.setCategory(null); // Limpia la categoría si no se proporciona un ID válido
+        }
+
         return productRepository.save(existingProduct);
     }
+
 
     public Optional<Product> productDelete(Long id) {
 
@@ -54,5 +72,23 @@ public class ProductService {
         productRepository.deleteById(id);
         return productDelete;
     }
+
+    public List<Product> findProductsWithLowStock(int threshold) {
+        // Suponiendo que tienes un repositorio que puede buscar productos con stock bajo
+        return productRepository.findByStockLessThan(threshold);
+    }
+
+    public List<Product> filterProducts(Category category, Double minPrice, Double maxPrice) {
+        if (category != null && minPrice != null && maxPrice != null) {
+            return productRepository.findByCategoryAndPriceBetween(category, minPrice, maxPrice);
+        } else if (category != null) {
+            return productRepository.findByCategory(category);
+        } else if (minPrice != null && maxPrice != null) {
+            return productRepository.findByPriceBetween(minPrice, maxPrice);
+        } else {
+            return productRepository.findAll();
+        }
+    }
+
 
 }
