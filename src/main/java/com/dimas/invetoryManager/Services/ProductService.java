@@ -78,11 +78,14 @@ public class ProductService {
         return productRepository.findByStockLessThan(threshold);
     }
 
-    public List<Product> filterProducts(Category category, Double minPrice, Double maxPrice) {
-        if (category != null && minPrice != null && maxPrice != null) {
-            return productRepository.findByCategoryAndPriceBetween(category, minPrice, maxPrice);
-        } else if (category != null) {
-            return productRepository.findByCategory(category);
+    public List<Product> filterProducts(Optional<Category> category, Double minPrice, Double maxPrice) {
+
+        Category categoryOptional = category.orElse(null);
+
+        if (categoryOptional != null && minPrice != null && maxPrice != null) {
+            return productRepository.findByCategoryAndPriceBetween(categoryOptional, minPrice, maxPrice);
+        } else if (categoryOptional != null) {
+            return productRepository.findByCategory(categoryOptional);
         } else if (minPrice != null && maxPrice != null) {
             return productRepository.findByPriceBetween(minPrice, maxPrice);
         } else {

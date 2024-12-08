@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product,Long> {
 
-    public Product findFirstById(Long id);
+    Product findFirstById(Long id);
 
-    public List<Product> findByStockLessThan(int threshold);
-    public List<Product> findByCategory(Category category);
-    public List<Product> findByPriceBetween(Double minPrice, Double maxPrice);
-    public List<Product> findByCategoryAndPriceBetween(Category category, Double minPrice, Double maxPrice);
+    List<Product> findByStockLessThan(int threshold);
+    List<Product> findByCategory(Category category);
+    List<Product> findByPriceBetween(Double minPrice, Double maxPrice);
+    List<Product> findByCategoryAndPriceBetween(Category category, Double minPrice, Double maxPrice);
 
 }

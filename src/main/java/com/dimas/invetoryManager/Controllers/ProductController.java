@@ -63,24 +63,37 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
-    // Endpoint para filtrar productos por categoría o rango de precio
     @GetMapping("/filter")
-    public ResponseEntity<List<Product>> filterProducts(
+    public ResponseEntity<?> filterProducts(
             @RequestParam(required = false) String categoryName,  // Recibe solo el nombre de la categoría
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice) {
 
-        Category category = categoryService.findByName(categoryName);  // Busca la categoría en el repositorio
-        System.out.println("ID: " + category.getId());
-        System.out.println("Name: " + category.getName());
+        // Busca la categoría en el repositorio
+        Optional<Category> category = Optional.ofNullable(categoryService.findByName(categoryName));
+
+        // Si el nombre de la categoría no corresponde a ninguna, devolver un mensaje específico
+        if (categoryName != null && category.isEmpty()) {
+            return ResponseEntity.badRequest()
+                    .body("La categoría con el nombre '" + categoryName + "' no existe en el sistema.");
+        }
+
+        // Solo imprime si la categoría está presente
+        if (category.isPresent()) {
+            System.out.println("ID: " + category.get().getId());
+            System.out.println("Name: " + category.get().getName());
+        } else {
+            System.out.println("No se proporcionó una categoría válida.");
+        }
+
+        // Filtrar productos
         List<Product> filteredProducts = productService.filterProducts(category, minPrice, maxPrice);
 
+        // Retornar respuesta
         if (!filteredProducts.isEmpty()) {
             return ResponseEntity.ok(filteredProducts);
         }
         return ResponseEntity.noContent().build();
     }
-
-
-
+    
 }
